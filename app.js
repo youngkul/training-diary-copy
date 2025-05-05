@@ -36,7 +36,7 @@ async function uploadVideo() {
       .from("training-diary")
       .getPublicUrl(filePath);
     const url = publicUrlData.publicUrl;
-  
+    console.log("최종 삽입 데이터:", { url, note, uid: session.user.id });
     // ✅ DB에 영상 메타데이터 저장
     // ✅ DB에 영상 메타데이터 저장
     const { error: insertError } = await supabase.from("videos").insert([
