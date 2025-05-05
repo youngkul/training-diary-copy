@@ -40,8 +40,9 @@ async function uploadVideo() {
     // ✅ DB에 영상 메타데이터 저장
     // ✅ DB에 영상 메타데이터 저장
     const { error: insertError } = await supabase.from("videos").insert([
-        { uid: session.user.id, url, note } // ✅ 반드시 uid 포함
+        { url, note } // uid 생략!
     ]);
+    
     
     if (insertError) {
         console.error("insertError:", insertError);
