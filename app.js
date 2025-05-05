@@ -40,7 +40,6 @@ async function uploadVideo() {
     alert("로그인 정보 확인 실패");
     return;
   }
-
   const { error: insertError } = await supabase.from("videos").insert([
     { uid: user.id, url, note }
   ]);
@@ -113,6 +112,7 @@ async function postComment(videoId) {
 
   const session = await getSession();
   const uid = session?.user?.id;
+  console.log("세션에서 가져온 uid:", uid);
   if (!uid) {
     alert("로그인이 필요합니다.");
     return;
