@@ -25,7 +25,9 @@ async function uploadVideo() {
     const { error: uploadError } = await supabase.storage
       .from("training-diary")
       .upload(filePath, file, { upsert: true });
-  
+      console.log("✅ filePath:", filePath);
+      console.log("✅ file:", file);
+      console.log("❌ uploadError:", uploadError);
     if (uploadError) {
       alert("업로드 실패: " + uploadError.message);
       return;
