@@ -14,9 +14,13 @@ async function uploadVideo() {
       return;
     }
   
-    const safeFileName = encodeURIComponent(file.name); // ✅ 안전하게 파일명 처리
-    const filePath = `${uid}/${Date.now()}_${safeFileName}`;
+    // ✅ 안전한 파일 이름 만들기 (확장자 포함)
+    const extension = file.name.split('.').pop();
+    const timestamp = Date.now();
+    const safeFileName = `${timestamp}.${extension}`;  // 예: 1746412345678.mp4
+    const filePath = `${uid}/${safeFileName}`;
   
+    // ✅ 업로드 (이미 있으면 덮어쓰기: upsert true)
     const { error: uploadError } = await supabase.storage
       .from("training-diary")
       .upload(filePath, file, { upsert: true });
@@ -26,12 +30,14 @@ async function uploadVideo() {
       return;
     }
   
+    // ✅ 퍼블릭 URL 가져오기
     const { data: publicUrlData } = supabase.storage
       .from("training-diary")
       .getPublicUrl(filePath);
   
     const url = publicUrlData.publicUrl;
   
+    // ✅ DB에 메타데이터 저장
     const { error: insertError } = await supabase.from("videos").insert([
       { uid, url, note }
     ]);
@@ -42,8 +48,9 @@ async function uploadVideo() {
     }
   
     alert("업로드 성공!");
-    loadAllVideos();
+    loadAllVideos();  // 영상 목록 갱신
   }
+  
   
 
 // ✅ 전체 영상 불러오기
