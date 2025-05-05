@@ -8,53 +8,51 @@ async function uploadVideo() {
   if (!file) return alert("영상을 선택하세요.");
 
   // ✅ 세션에서 uid 가져오기
-  const session = await getSession();
-  const uid = session?.user?.id;
-  console.log("세션에서 가져온 uid:", uid);
-  if (!uid) {
-    alert("로그인이 필요합니다.");
-    return;
-  }
+  // ✅ 로그인 세션에서 uid 가져오기
+const session = await getSession();
+const uid = session?.user?.id;
+console.log("세션에서 가져온 uid:", uid);
+if (!uid) {
+  alert("로그인이 필요합니다.");
+  return;
+}
 
-  // ✅ 안전한 파일 이름 만들기
-  const extension = file.name.split('.').pop();
-  const timestamp = Date.now();
-  const safeFileName = `${timestamp}.${extension}`;
-  const filePath = `${uid}/${safeFileName}`;
+// ✅ 안전한 파일 이름 만들기
+const extension = file.name.split('.').pop();
+const timestamp = Date.now();
+const safeFileName = `${timestamp}.${extension}`;
+const filePath = `${uid}/${safeFileName}`;
 
-  // ✅ 영상 업로드
-  const { error: uploadError } = await supabase.storage
-    .from("training-diary")
-    .upload(filePath, file, { upsert: true });
+// ✅ 영상 업로드
+const { error: uploadError } = await supabase.storage
+  .from("training-diary")
+  .upload(filePath, file, { upsert: true });
 
-  if (uploadError) {
-    alert("업로드 실패: " + uploadError.message);
-    return;
-  }
+if (uploadError) {
+  alert("업로드 실패: " + uploadError.message);
+  return;
+}
 
-  // ✅ 퍼블릭 URL 가져오기
-  const { data: publicUrlData } = supabase.storage
-    .from("training-diary")
-    .getPublicUrl(filePath);
+// ✅ 퍼블릭 URL 가져오기
+const { data: publicUrlData } = supabase.storage
+  .from("training-diary")
+  .getPublicUrl(filePath);
 
-  const url = publicUrlData?.publicUrl;
-  if (!url) {
-    alert("퍼블릭 URL 가져오기 실패");
-    return;
-  }
+const url = publicUrlData.publicUrl;
 
-  // ✅ DB에 메타데이터 저장
-  const { error: insertError } = await supabase.from("videos").insert([
-    { uid, url, note }
-  ]);
+// ✅ DB에 메타데이터 저장
+const { error: insertError } = await supabase.from("videos").insert([
+  { uid, url, note }
+]);
 
-  if (insertError) {
-    alert("DB 저장 실패: " + insertError.message);
-    return;
-  }
+if (insertError) {
+  alert("DB 저장 실패: " + insertError.message);
+  return;
+}
 
-  alert("업로드 성공!");
-  loadAllVideos();
+alert("업로드 성공!");
+loadAllVideos();
+
 }
 
 
