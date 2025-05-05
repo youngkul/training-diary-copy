@@ -7,18 +7,22 @@ async function uploadVideo() {
   const note = document.getElementById("videoNote").value;
   if (!file) return alert("영상을 선택하세요.");
 
+  // ✅ 세션에서 uid 가져오기
   const session = await getSession();
   const uid = session?.user?.id;
+  console.log("세션에서 가져온 uid:", uid);
   if (!uid) {
-    alert("로그인되어 있지 않습니다.");
+    alert("로그인이 필요합니다.");
     return;
   }
 
+  // ✅ 안전한 파일 이름 만들기
   const extension = file.name.split('.').pop();
   const timestamp = Date.now();
   const safeFileName = `${timestamp}.${extension}`;
   const filePath = `${uid}/${safeFileName}`;
 
+  // ✅ 영상 업로드
   const { error: uploadError } = await supabase.storage
     .from("training-diary")
     .upload(filePath, file, { upsert: true });
@@ -28,20 +32,20 @@ async function uploadVideo() {
     return;
   }
 
+  // ✅ 퍼블릭 URL 가져오기
   const { data: publicUrlData } = supabase.storage
     .from("training-diary")
     .getPublicUrl(filePath);
 
-  const url = publicUrlData.publicUrl;
-
-  // ✅ 로그인 사용자 정보 가져오기
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    alert("로그인 정보 확인 실패");
+  const url = publicUrlData?.publicUrl;
+  if (!url) {
+    alert("퍼블릭 URL 가져오기 실패");
     return;
   }
+
+  // ✅ DB에 메타데이터 저장
   const { error: insertError } = await supabase.from("videos").insert([
-    { uid: user.id, url, note }
+    { uid, url, note }
   ]);
 
   if (insertError) {
@@ -52,6 +56,7 @@ async function uploadVideo() {
   alert("업로드 성공!");
   loadAllVideos();
 }
+
 
 // ✅ 전체 영상 불러오기
 async function loadAllVideos() {
