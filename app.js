@@ -3,55 +3,56 @@ import { supabase } from "./supabase-config.js";
 
 // ✅ 영상 업로드
 async function uploadVideo() {
-    const file = document.getElementById("videoInput").files[0];
-    const note = document.getElementById("videoNote").value;
-    if (!file) return alert("영상을 선택하세요.");
-  
-    const session = await getSession();
-    const uid = session?.user?.id;
-    if (!uid) {
-      alert("로그인되어 있지 않습니다.");
-      return;
-    }
-  
-    // ✅ 안전한 파일 이름 만들기 (확장자 포함)
-    const extension = file.name.split('.').pop();
-    const timestamp = Date.now();
-    const safeFileName = `${timestamp}.${extension}`;  // 예: 1746412345678.mp4
-    const filePath = `${uid}/${safeFileName}`;
-  
-    // ✅ 업로드 (이미 있으면 덮어쓰기: upsert true)
-    const { error: uploadError } = await supabase.storage
-      .from("training-diary")
-      .upload(filePath, file, { upsert: true });
-  
-    if (uploadError) {
-      alert("업로드 실패: " + uploadError.message);
-      return;
-    }
-  
-    // ✅ 퍼블릭 URL 가져오기
-    const { data: publicUrlData } = supabase.storage
-      .from("training-diary")
-      .getPublicUrl(filePath);
-  
-    const url = publicUrlData.publicUrl;
-  
-    // ✅ DB에 메타데이터 저장
-    const { error: insertError } = await supabase.from("videos").insert([
-      { uid, url, note }
-    ]);
-  
-    if (insertError) {
-      alert("DB 저장 실패: " + insertError.message);
-      return;
-    }
-  
-    alert("업로드 성공!");
-    loadAllVideos();  // 영상 목록 갱신
+  const file = document.getElementById("videoInput").files[0];
+  const note = document.getElementById("videoNote").value;
+  if (!file) return alert("영상을 선택하세요.");
+
+  const session = await getSession();
+  const uid = session?.user?.id;
+  if (!uid) {
+    alert("로그인되어 있지 않습니다.");
+    return;
   }
-  
-  
+
+  const extension = file.name.split('.').pop();
+  const timestamp = Date.now();
+  const safeFileName = `${timestamp}.${extension}`;
+  const filePath = `${uid}/${safeFileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("training-diary")
+    .upload(filePath, file, { upsert: true });
+
+  if (uploadError) {
+    alert("업로드 실패: " + uploadError.message);
+    return;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("training-diary")
+    .getPublicUrl(filePath);
+
+  const url = publicUrlData.publicUrl;
+
+  // ✅ 로그인 사용자 정보 가져오기
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    alert("로그인 정보 확인 실패");
+    return;
+  }
+
+  const { error: insertError } = await supabase.from("videos").insert([
+    { uid: user.id, url, note }
+  ]);
+
+  if (insertError) {
+    alert("DB 저장 실패: " + insertError.message);
+    return;
+  }
+
+  alert("업로드 성공!");
+  loadAllVideos();
+}
 
 // ✅ 전체 영상 불러오기
 async function loadAllVideos() {
@@ -130,7 +131,7 @@ async function postComment(videoId) {
   loadComments(videoId);
 }
 
-// ✅ 로그인 상태 확인 및 UI 분기
+// ✅ 로그인 상태 확인 및 UI 전환
 async function checkLoginStatus() {
   const session = await getSession();
   const authDiv = document.getElementById("authSection");
@@ -141,18 +142,19 @@ async function checkLoginStatus() {
     authDiv.classList.add("hidden");
     mainDiv.classList.remove("hidden");
     userInfo.innerText = `로그인됨: ${session.user.email}`;
-    loadAllVideos(); // 로그인 시 영상 로딩
+    loadAllVideos();
   } else {
     authDiv.classList.remove("hidden");
     mainDiv.classList.add("hidden");
   }
 }
 
-// ✅ 페이지 로딩 시 상태 체크
+// ✅ 페이지 로딩 시 실행
 document.addEventListener("DOMContentLoaded", checkLoginStatus);
 
-// ✅ 전역 함수 연결
+// ✅ 전역 등록
 window.uploadVideo = uploadVideo;
 window.postComment = postComment;
+
 
    
