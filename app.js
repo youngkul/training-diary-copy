@@ -38,19 +38,20 @@ async function uploadVideo() {
     const url = publicUrlData.publicUrl;
   
     // ✅ DB에 영상 메타데이터 저장
-    await supabase.from("videos").insert([
+    // ✅ DB에 영상 메타데이터 저장
+    const { error: insertError } = await supabase.from("videos").insert([
         { uid: session.user.id, url, note } // ✅ 반드시 uid 포함
-      ]);
-      
-      
-     if (insertError) {
+    ]);
+    
+    if (insertError) {
         console.error("insertError:", insertError);
         alert("DB 저장 실패: " + insertError.message);
         return;
-      }
-  
+    }
+    
     alert("업로드 성공!");
     loadAllVideos();
+  
   }
   
 
