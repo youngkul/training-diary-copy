@@ -3,46 +3,48 @@ import { supabase } from "./supabase-config.js";
 
 // ✅ 영상 업로드
 async function uploadVideo() {
-  const file = document.getElementById("videoInput").files[0];
-  const note = document.getElementById("videoNote").value;
-  if (!file) return alert("영상을 선택하세요.");
-
-  const session = await getSession();
-  const uid = session?.user?.id;
-  if (!uid) {
-    alert("로그인되어 있지 않습니다.");
-    return;
+    const file = document.getElementById("videoInput").files[0];
+    const note = document.getElementById("videoNote").value;
+    if (!file) return alert("영상을 선택하세요.");
+  
+    const session = await getSession();
+    const uid = session?.user?.id;
+    if (!uid) {
+      alert("로그인되어 있지 않습니다.");
+      return;
+    }
+  
+    const safeFileName = encodeURIComponent(file.name); // ✅ 안전하게 파일명 처리
+    const filePath = `${uid}/${Date.now()}_${safeFileName}`;
+  
+    const { error: uploadError } = await supabase.storage
+      .from("training-diary")
+      .upload(filePath, file, { upsert: true });
+  
+    if (uploadError) {
+      alert("업로드 실패: " + uploadError.message);
+      return;
+    }
+  
+    const { data: publicUrlData } = supabase.storage
+      .from("training-diary")
+      .getPublicUrl(filePath);
+  
+    const url = publicUrlData.publicUrl;
+  
+    const { error: insertError } = await supabase.from("videos").insert([
+      { uid, url, note }
+    ]);
+  
+    if (insertError) {
+      alert("DB 저장 실패: " + insertError.message);
+      return;
+    }
+  
+    alert("업로드 성공!");
+    loadAllVideos();
   }
-
-  const filePath = `${uid}/${Date.now()}_${file.name}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("training-diary")
-    .upload(filePath, file, { upsert: true });
-
-  if (uploadError) {
-    alert("업로드 실패: " + uploadError.message);
-    return;
-  }
-
-  const { data: publicUrlData } = supabase.storage
-    .from("training-diary")
-    .getPublicUrl(filePath);
-
-  const url = publicUrlData.publicUrl;
-
-  const { error: insertError } = await supabase.from("videos").insert([
-    { uid, url, note }
-  ]);
-
-  if (insertError) {
-    alert("DB 저장 실패: " + insertError.message);
-    return;
-  }
-
-  alert("업로드 성공!");
-  loadAllVideos();
-}
+  
 
 // ✅ 전체 영상 불러오기
 async function loadAllVideos() {
