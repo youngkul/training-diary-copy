@@ -42,7 +42,7 @@ async function uploadVideo() {
     const { error: insertError } = await supabase.from("videos").insert([
         { url, note } // uid 생략!
     ]);
-    
+    console.log("insertError:", insertError);
     
     if (insertError) {
         console.error("insertError:", insertError);
