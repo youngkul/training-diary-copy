@@ -100,7 +100,12 @@ async function loadAllVideos() {
   for (const video of videos) {
     const videoDiv = document.createElement("div");
     videoDiv.classList.add("space-y-2", "border-b", "pb-4");
-  
+    const dateStr = new Date(video.created_at).toLocaleDateString("ko-KR");
+    videoDiv.innerHTML = `
+      <p><strong>등록일:</strong> ${dateStr}</p>
+      ...
+    `;
+    
     videoDiv.innerHTML = `
   <video src="${video.url}" controls width="300" class="rounded shadow"></video>
   <p><strong>메모:</strong> ${video.note || "없음"}</p>
