@@ -1,39 +1,76 @@
-/* style.css */
+/* style.css - 반응형 및 세련된 디자인 */
 
+/* 기본 입력 요소 */
 input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="file"] {
+input[type="file"],
+textarea {
   font-size: 1rem;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
   width: 100%;
   background-color: #fff;
   box-sizing: border-box;
+  transition: border-color 0.3s ease;
 }
 
+input:focus,
+textarea:focus {
+  border-color: #6366f1; /* indigo-500 */
+  outline: none;
+}
+
+/* 버튼 */
 button {
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 button:hover {
   transform: scale(1.02);
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 비디오 */
 video {
   border-radius: 0.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  width: 100%;
+  height: auto;
 }
 
+/* 댓글 영역 */
 #videoFeed > div {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #ddd;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
 }
-#videoNote {
-    background-color: yellow !important;
-    z-index: 9999 !important;
-    position: relative !important;
+
+/* 제목 */
+h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  body {
+    padding: 1rem;
   }
-  
+
+  .max-w-xl {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .rounded-xl {
+    border-radius: 1rem;
+  }
+}
