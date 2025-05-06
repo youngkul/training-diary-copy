@@ -1,6 +1,38 @@
 import { supabase } from "./supabase-config.js";
 import { getSession } from "./auth.js";
 
+export async function handleSignup() {
+    const email = document.getElementById("authEmail").value;
+    const password = document.getElementById("authPassword").value;
+    const name = document.getElementById("authName").value;
+  
+    if (!email || !password || !name) {
+      alert("이메일, 비밀번호, 이름을 모두 입력해주세요.");
+      return;
+    }
+  
+    const { data, error } = await supabase.auth.signUp({ email, password });
+  
+    if (error) {
+      alert("회원가입 실패: " + error.message);
+      return;
+    }
+  
+    const uid = data.user?.id;
+  
+    if (uid) {
+      const { error: insertError } = await supabase
+        .from("players")
+        .insert([{ uid, name }]);
+  
+      if (insertError) {
+        alert("이름 저장 실패: " + insertError.message);
+      }
+    }
+  
+    alert("회원가입 성공! 로그인 해주세요.");
+  }
+  
 // ✅ 영상 업로드
 async function uploadVideo() {
   const file = document.getElementById("videoInput").files[0];
@@ -84,7 +116,7 @@ window.deleteVideo = async function (videoId, videoUrl) {
 async function loadAllVideos() {
   const { data: videos, error } = await supabase
     .from("videos")
-    .select("id, uid, url, note, created_at")
+    .select("id, uid, url, note, created_at, players(name)")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -106,7 +138,8 @@ async function loadAllVideos() {
 // 영상 목록 반복문 안에서
 videoDiv.innerHTML = `
   <div class="bg-white rounded-2xl shadow-lg p-5 space-y-4">
-    <p class="text-sm text-gray-500">${timeAgo(video.created_at)}에 업로드됨</p>
+    <p class="text-sm text-gray-500"><strong>${video.players?.name || "알 수 없음"}</strong>님이 ${timeAgo(video.created_at)}에 업로드함</p>
+
 
     <video 
       src="${video.url}" 
@@ -319,6 +352,7 @@ window.deleteNote = async function(videoId) {
   };
   
   
+  window.handleSignup = handleSignup;
 
 
    
