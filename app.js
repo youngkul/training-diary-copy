@@ -107,14 +107,15 @@ async function loadAllVideos() {
 videoDiv.innerHTML = `
   <p class="text-sm text-gray-600"><strong>등록일:</strong> ${dateStr}</p>
   <video 
-    src="${video.url}" 
-    controls 
-    preload="metadata" 
-    playsinline 
-    muted
-    class="w-full rounded-xl shadow-md"
-    poster="https://placehold.co/640x360?text=영상+미리보기">
-  </video>
+  src="${video.url}" 
+  controls 
+  preload="metadata" 
+  playsinline 
+  muted 
+  class="w-full rounded-xl shadow-md">
+</video>
+
+
 
   <p class="mt-2 font-medium text-gray-800"><strong>메모:</strong> 
     <span id="note-${video.id}">${video.note || "없음"}</span>
