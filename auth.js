@@ -43,21 +43,23 @@ export async function getSession() {
   }
   return session;
 }
-// HTML 버튼에서 직접 호출할 수 있도록 window에 연결
+
+// 전역 연결
 window.handleSignup = async function () {
-    const email = document.getElementById("authEmail").value;
-    const password = document.getElementById("authPassword").value;
-    await signup(email, password);
-  };
-  
-  window.handleLogin = async function () {
-    const email = document.getElementById("authEmail").value;
-    const password = document.getElementById("authPassword").value;
-    const session = await login(email, password);
-    if (session) location.reload();
-  };
-  
-  window.handleLogout = async function () {
-    await logout();
-  };
+  const email = document.getElementById("authEmail").value;
+  const password = document.getElementById("authPassword").value;
+  await signup(email, password);
+};
+
+window.handleLogin = async function () {
+  const email = document.getElementById("authEmail").value;
+  const password = document.getElementById("authPassword").value;
+  const session = await login(email, password);
+  if (session) location.reload();
+};
+
+window.handleLogout = async function () {
+  await logout();
+};
+
   
