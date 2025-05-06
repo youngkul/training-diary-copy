@@ -100,22 +100,24 @@ async function loadAllVideos() {
   for (const video of videos) {
     const videoDiv = document.createElement("div");
     videoDiv.classList.add("space-y-2", "border-b", "pb-4");
-
+  
     videoDiv.innerHTML = `
       <video src="${video.url}" controls width="300" class="rounded shadow"></video>
       <p><strong>메모:</strong> ${video.note || "없음"}</p>
-      ${video.uid === currentUid
-        ? `<button onclick="deleteVideo(${video.id}, '${video.url}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">영상 삭제</button>`
-        : ""
+      ${
+        video.uid === currentUid
+          ? `<button onclick="deleteVideo(${video.id}, '${video.url}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">영상 삭제</button>`
+          : ""
       }
       <div id="comments-${video.id}" class="mt-2"></div>
       <input type="text" placeholder="댓글 작성" id="comment-input-${video.id}" class="p-1 border rounded w-full" />
-      <button onclick="postComment(${video.id})" class="mt-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">댓글 달기</button>
+      <button onclick="postComment('${video.id}')" class="mt-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">댓글 달기</button>
     `;
-
+  
     container.appendChild(videoDiv);
     await loadComments(video.id);
   }
+  
 }
 
 // ✅ 댓글 불러오기
