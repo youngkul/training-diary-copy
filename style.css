@@ -1,42 +1,125 @@
-textarea, input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="file"] {
-  font-size: 1rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ccc;
-  width: 100%;
-  box-sizing: border-box;
-}
+/* style.css - 반응형 고급 스타일 */
 
-textarea:focus, input:focus {
-  border-color: #6366f1;
-  outline: none;
-}
-
-button {
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  background-color: #6366f1;
-  color: white;
-  transition: transform 0.2s ease;
-}
-
-button:hover {
-  transform: scale(1.02);
-}
-
-video {
-  width: 100%;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-/* style.css */
-.test-style {
-    background-color: red;
+body {
+    background: linear-gradient(to right, #f8fafc, #e2e8f0); /* 고급 배경 그라데이션 */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #1f2937; /* text-gray-800 */
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* 기본 입력 요소 */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="file"],
+  textarea {
+    font-size: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid #cbd5e1; /* gray-300 */
+    width: 100%;
+    background-color: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  input:focus,
+  textarea:focus {
+    border-color: #6366f1; /* indigo-500 */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    outline: none;
+  }
+  
+  /* 버튼 스타일 */
+  button {
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    border: none;
+  }
+  
+  button:hover {
+    transform: scale(1.03);
+  }
+  
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* 커스텀 버튼 컬러 */
+  .custom-button.yellow {
+    background-color: #facc15; /* yellow-400 */
+    color: #1f2937;
+  }
+  
+  .custom-button.gray {
+    background-color: #6b7280; /* gray-500 */
     color: white;
-    padding: 1rem;
+  }
+  
+  .custom-button.red {
+    background-color: #ef4444; /* red-500 */
+    color: white;
+  }
+  
+  .custom-button.green {
+    background-color: #22c55e; /* green-500 */
+    color: white;
+  }
+  
+  .custom-button.blue {
+    background-color: #3b82f6; /* blue-500 */
+    color: white;
+  }
+  
+  /* 비디오 */
+  video {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    height: auto;
+  }
+  
+  /* 카드 스타일 */
+  .card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* 댓글 영역 */
+  #videoFeed > div {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b; /* slate-800 */
+  }
+  
+  /* 반응형 개선 */
+  @media (max-width: 640px) {
+    body {
+      padding: 1rem;
+    }
+  
+    .max-w-xl,
+    .max-w-sm {
+      width: 100% !important;
+      padding: 1rem !important;
+    }
+  
+    .rounded-xl {
+      border-radius: 1rem;
+    }
   }
   
