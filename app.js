@@ -238,32 +238,35 @@ async function checkLoginStatus() {
 }
 
 // ✅ 페이지 로딩 시 실행
+// ✅ 페이지 로딩 시 실행
 document.addEventListener("DOMContentLoaded", checkLoginStatus);
 
 // ✅ 전역 등록
 window.uploadVideo = uploadVideo;
+
 window.updateNote = async function(videoId) {
-    const input = document.getElementById(`edit-note-${videoId}`);
-    const newNote = input.value.trim();
-    if (!newNote) {
-      alert("메모 내용을 입력해주세요.");
-      return;
-    }
-  
-    const { error } = await supabase
-      .from("videos")
-      .update({ note: newNote })
-      .eq("id", videoId);
-  
-    if (error) {
-      alert("메모 업데이트 실패: " + error.message);
-      return;
-    }
-  
-    document.getElementById(`note-${videoId}`).textContent = newNote;
-    input.value = "";
-    alert("메모가 저장되었습니다!");
-  };
+  const input = document.getElementById(`edit-note-${videoId}`);
+  const newNote = input.value.trim();
+  if (!newNote) {
+    alert("메모 내용을 입력해주세요.");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("videos")
+    .update({ note: newNote })
+    .eq("id", videoId);
+
+  if (error) {
+    alert("메모 업데이트 실패: " + error.message);
+    return;
+  }
+
+  document.getElementById(`note-${videoId}`).textContent = newNote;
+  input.value = "";
+  alert("메모가 저장되었습니다!");
+};
+
   
 
 
