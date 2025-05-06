@@ -184,46 +184,58 @@ videoDiv.innerHTML = `
 
 // ✅ 댓글 불러오기
 async function loadComments(videoId) {
-  const { data: comments,error } = await supabase
-    .from("comments")
-    .select("id, uid, content, created_at")
-    .eq("video_id", videoId)
-    .order("created_at", { ascending: true });
+    const { data: comments, error } = await supabase
+      .from("comments")
+      .select(`
+        id,
+        uid,
+        content,
+        created_at,
+        users:uid (
+          user_metadata
+        )
+      `)
+      .eq("video_id", videoId)
+      .order("created_at", { ascending: true });
+  
     if (error) {
-        console.error("댓글 불러오기 오류:", error.message);
-        return;
-        }
-
+      console.error("댓글 불러오기 오류:", error.message);
+      return;
+    }
+  
     if (!comments) {
-    console.warn("댓글이 없습니다 또는 불러오기 실패");
-    return;
+      console.warn("댓글이 없습니다 또는 불러오기 실패");
+      return;
     }
-    
-  const session = await getSession();
-  const currentUid = session?.user?.id;
-
-  const commentDiv = document.getElementById(`comments-${videoId}`);
-  commentDiv.innerHTML = "<p class='font-semibold'>댓글:</p>";
-
-  comments.forEach(comment => {
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("flex", "justify-between", "items-center");
-
-    const p = document.createElement("p");
-    p.textContent = `- ${comment.content}`;
-    wrapper.appendChild(p);
-
-    if (comment.uid === currentUid) {
-      const btn = document.createElement("button");
-      btn.textContent = "삭제";
-      btn.className = "text-sm text-red-500 ml-2";
-      btn.onclick = () => deleteComment(videoId, comment.id);
-      wrapper.appendChild(btn);
-    }
-
-    commentDiv.appendChild(wrapper);
-  });
-}
+  
+    const session = await getSession();
+    const currentUid = session?.user?.id;
+  
+    const commentDiv = document.getElementById(`comments-${videoId}`);
+    commentDiv.innerHTML = "<p class='font-semibold'>댓글:</p>";
+  
+    comments.forEach(comment => {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("flex", "justify-between", "items-center");
+  
+      const name = comment.users?.user_metadata?.full_name || "익명";
+  
+      const p = document.createElement("p");
+      p.innerHTML = `<strong class="text-blue-500">${name}</strong>: ${comment.content}`;
+      wrapper.appendChild(p);
+  
+      if (comment.uid === currentUid) {
+        const btn = document.createElement("button");
+        btn.textContent = "삭제";
+        btn.className = "text-sm text-red-500 ml-2";
+        btn.onclick = () => deleteComment(videoId, comment.id);
+        wrapper.appendChild(btn);
+      }
+  
+      commentDiv.appendChild(wrapper);
+    });
+  }
+  
 function timeAgo(dateString) {
     const now = new Date();
     const uploaded = new Date(dateString);
