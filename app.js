@@ -186,15 +186,7 @@ videoDiv.innerHTML = `
 async function loadComments(videoId) {
     const { data: comments, error } = await supabase
       .from("comments")
-      .select(`
-        id,
-        uid,
-        content,
-        created_at,
-        users:uid (
-          user_metadata
-        )
-      `)
+      .select("id, uid, content, created_at")
       .eq("video_id", videoId)
       .order("created_at", { ascending: true });
   
@@ -203,14 +195,8 @@ async function loadComments(videoId) {
       return;
     }
   
-    if (!comments) {
-      console.warn("댓글이 없습니다 또는 불러오기 실패");
-      return;
-    }
-  
     const session = await getSession();
     const currentUid = session?.user?.id;
-  
     const commentDiv = document.getElementById(`comments-${videoId}`);
     commentDiv.innerHTML = "<p class='font-semibold'>댓글:</p>";
   
@@ -218,12 +204,8 @@ async function loadComments(videoId) {
       const wrapper = document.createElement("div");
       wrapper.classList.add("flex", "justify-between", "items-center");
   
-      const name = comment.users?.user_metadata?.full_name || "익명";
-      p.textContent = `- ${name}: ${comment.content}`;
-
-  
       const p = document.createElement("p");
-      p.innerHTML = `<strong class="text-blue-500">${name}</strong>: ${comment.content}`;
+      p.textContent = `- ${comment.content}`;
       wrapper.appendChild(p);
   
       if (comment.uid === currentUid) {
@@ -237,6 +219,7 @@ async function loadComments(videoId) {
       commentDiv.appendChild(wrapper);
     });
   }
+  
   
 function timeAgo(dateString) {
     const now = new Date();
