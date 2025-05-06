@@ -1,20 +1,27 @@
-/* style.css — 반응형 + Tailwind와 조화되는 세련된 스타일 */
-
-input[type="text"],
+textarea, input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="file"],
-textarea {
-  @apply w-full p-3 rounded border border-gray-300 text-sm bg-white;
+input[type="file"] {
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-input:focus,
-textarea:focus {
-  @apply border-indigo-500 outline-none;
+textarea:focus, input:focus {
+  border-color: #6366f1;
+  outline: none;
 }
 
 button {
-  @apply font-semibold transition-transform duration-200 ease-in-out cursor-pointer;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #6366f1;
+  color: white;
+  transition: transform 0.2s ease;
 }
 
 button:hover {
@@ -22,32 +29,8 @@ button:hover {
 }
 
 video {
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   width: 100%;
-  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-#videoFeed > div {
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-h2 {
-  @apply text-lg font-bold text-gray-900;
-}
-
-@media (max-width: 640px) {
-  body {
-    padding: 1rem;
-  }
-
-  .max-w-xl {
-    width: 100%;
-    padding: 1rem;
-  }
-
-  .rounded-xl {
-    border-radius: 1rem;
-  }
-}
