@@ -1,38 +1,7 @@
 import { supabase } from "./supabase-config.js";
 import { getSession } from "./auth.js";
 
-export async function handleSignup() {
-    const email = document.getElementById("authEmail").value;
-    const password = document.getElementById("authPassword").value;
-    const name = document.getElementById("authName").value;
-  
-    if (!email || !password || !name) {
-      alert("이메일, 비밀번호, 이름을 모두 입력해주세요.");
-      return;
-    }
-  
-    const { data, error } = await supabase.auth.signUp({ email, password });
-  
-    if (error) {
-      alert("회원가입 실패: " + error.message);
-      return;
-    }
-  
-    const uid = data.user?.id;
-  
-    if (uid) {
-      const { error: insertError } = await supabase
-        .from("players")
-        .insert([{ uid, name }]);
-  
-      if (insertError) {
-        alert("이름 저장 실패: " + insertError.message);
-      }
-    }
-  
-    alert("회원가입 성공! 로그인 해주세요.");
-  }
-  
+
 // ✅ 영상 업로드
 async function uploadVideo() {
   const file = document.getElementById("videoInput").files[0];
@@ -352,7 +321,6 @@ window.deleteNote = async function(videoId) {
   };
   
   
-  window.handleSignup = handleSignup;
 
 
    
