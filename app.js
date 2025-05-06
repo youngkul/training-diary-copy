@@ -1,24 +1,19 @@
 import { supabase } from "./supabase-config.js";
 import { getSession } from "./auth.js";
 
-
 // ✅ 영상 업로드
 async function uploadVideo() {
   const file = document.getElementById("videoInput").files[0];
   const note = document.getElementById("videoNote").value;
-  if (!file) return alert("영상을 선택하세요.");
 
+  if (!file) return alert("영상을 선택하세요.");
   const session = await getSession();
   const uid = session?.user?.id;
-  if (!uid) {
-    alert("로그인이 필요합니다.");
-    return;
-  }
+  if (!uid) return alert("로그인이 필요합니다.");
 
   const extension = file.name.split('.').pop();
-  const timestamp = Date.now();
-  const safeFileName = `${timestamp}.${extension}`;
-  const filePath = `${uid}/${safeFileName}`;
+  const fileName = `${Date.now()}.${extension}`;
+  const filePath = `${uid}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from("training-diary")
@@ -32,6 +27,7 @@ async function uploadVideo() {
   const { data: publicUrlData } = supabase.storage
     .from("training-diary")
     .getPublicUrl(filePath);
+
   const url = publicUrlData.publicUrl;
 
   const { error: insertError } = await supabase.from("videos").insert([
@@ -48,16 +44,13 @@ async function uploadVideo() {
 }
 
 // ✅ 영상 삭제
-window.deleteVideo = async function (videoId, videoUrl) {
+window.deleteVideo = async function(videoId, videoUrl) {
   const confirmDelete = confirm("정말 이 영상을 삭제하시겠습니까?");
   if (!confirmDelete) return;
 
   const session = await getSession();
   const uid = session?.user?.id;
-  if (!uid) {
-    alert("로그인이 필요합니다.");
-    return;
-  }
+  if (!uid) return alert("로그인이 필요합니다.");
 
   const filePath = videoUrl.split("/").slice(-2).join("/");
 
@@ -69,11 +62,10 @@ window.deleteVideo = async function (videoId, videoUrl) {
     .from("videos")
     .delete()
     .eq("id", videoId)
-    .eq("uid", uid); // 본인만 삭제 가능
+    .eq("uid", uid);
 
   if (fileError || dbError) {
-    console.error("삭제 오류:", fileError || dbError);
-    alert("삭제 실패");
+    alert("삭제 실패: " + (fileError?.message || dbError?.message));
     return;
   }
 
@@ -81,11 +73,11 @@ window.deleteVideo = async function (videoId, videoUrl) {
   loadAllVideos();
 };
 
-// ✅ 전체 영상 불러오기
+// ✅ 영상 목록 로드
 async function loadAllVideos() {
   const { data: videos, error } = await supabase
     .from("videos")
-    .select("id, uid, url, note, created_at, players(name)")
+    .select("id, uid, url, note, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -95,85 +87,52 @@ async function loadAllVideos() {
 
   const session = await getSession();
   const currentUid = session?.user?.id;
+
   const container = document.getElementById("videoFeed");
   container.innerHTML = "";
 
   for (const video of videos) {
     const videoDiv = document.createElement("div");
-    videoDiv.classList.add("space-y-2", "border-b", "pb-4");
+    videoDiv.classList.add("bg-white", "rounded-xl", "shadow", "p-4", "mb-6");
 
     const dateStr = new Date(video.created_at).toLocaleDateString("ko-KR");
 
-// 영상 목록 반복문 안에서
-videoDiv.innerHTML = `
-  <div class="bg-white rounded-2xl shadow-lg p-5 space-y-4">
-    <p class="text-sm text-gray-500"><strong>${video.players?.name || "알 수 없음"}</strong>님이 ${timeAgo(video.created_at)}에 업로드함</p>
-
-
-    <video 
-      src="${video.url}" 
-      controls 
-      preload="metadata" 
-      playsinline 
-      muted 
-      class="w-full aspect-video rounded-xl shadow-lg border border-gray-200">
-    </video>
-
-
-  <p class="mt-2 font-medium text-gray-800"><strong>메모:</strong> 
-    <span id="note-${video.id}">${video.note || "없음"}</span>
-  </p>
-
-  <input type="text" id="edit-note-${video.id}" placeholder="메모 수정" 
-    class="p-2 mt-1 w-full border rounded" />
-  
-  <div class="flex space-x-2 mt-2">
-    <button onclick="updateNote('${video.id}')" 
-      class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-      메모 저장
-    </button>
-    <button onclick="deleteNote('${video.id}')" 
-      class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
-      메모 삭제
-    </button>
-    <button onclick="deleteVideo('${video.id}', '${video.url}')" 
-      class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-      영상 삭제
-    </button>
-  </div>
-
-  <div id="comments-${video.id}" class="mt-4 text-sm text-gray-700"></div>
-  <input type="text" placeholder="댓글 작성" id="comment-input-${video.id}" 
-    class="p-2 mt-2 w-full border rounded" />
-  <button onclick="postComment('${video.id}')" 
-    class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-    댓글 달기
-  </button>
-`;
+    videoDiv.innerHTML = `
+      <p class="text-sm text-gray-500">업로드일: ${dateStr}</p>
+      <video src="${video.url}" controls class="w-full rounded-lg shadow-md mt-2"></video>
+      <p class="mt-2 font-medium text-gray-800"><strong>메모:</strong> <span id="note-${video.id}">${video.note || "없음"}</span></p>
+      <input type="text" id="edit-note-${video.id}" placeholder="메모 수정" class="p-2 mt-1 w-full border rounded" />
+      <div class="flex gap-2 mt-2">
+        <button onclick="updateNote('${video.id}')" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">메모 저장</button>
+        <button onclick="deleteNote('${video.id}')" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">메모 삭제</button>
+        ${video.uid === currentUid
+          ? `<button onclick="deleteVideo('${video.id}', '${video.url}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">영상 삭제</button>`
+          : ""
+        }
+      </div>
+      <div id="comments-${video.id}" class="mt-4 text-sm text-gray-700"></div>
+      <input type="text" placeholder="댓글 작성" id="comment-input-${video.id}" class="p-2 mt-2 w-full border rounded" />
+      <button onclick="postComment('${video.id}')" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">댓글 달기</button>
+    `;
 
     container.appendChild(videoDiv);
     await loadComments(video.id);
   }
-  
 }
 
 // ✅ 댓글 불러오기
 async function loadComments(videoId) {
-  const { data: comments,error } = await supabase
+  const { data: comments, error } = await supabase
     .from("comments")
     .select("id, uid, content, created_at")
     .eq("video_id", videoId)
     .order("created_at", { ascending: true });
-    if (error) {
-        console.error("댓글 불러오기 오류:", error.message);
-        return;
-        }
 
-    if (!comments) {
-    console.warn("댓글이 없습니다 또는 불러오기 실패");
+  if (error) {
+    console.error("댓글 불러오기 오류:", error.message);
     return;
-    }
-    
+  }
+
   const session = await getSession();
   const currentUid = session?.user?.id;
 
@@ -199,17 +158,7 @@ async function loadComments(videoId) {
     commentDiv.appendChild(wrapper);
   });
 }
-function timeAgo(dateString) {
-    const now = new Date();
-    const uploaded = new Date(dateString);
-    const diff = (now - uploaded) / 1000; // 초 단위
-  
-    if (diff < 60) return "방금 전";
-    if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
-    return `${Math.floor(diff / 86400)}일 전`;
-  }
-  
+
 // ✅ 댓글 작성
 window.postComment = async function (videoId) {
   const input = document.getElementById(`comment-input-${videoId}`);
@@ -218,10 +167,7 @@ window.postComment = async function (videoId) {
 
   const session = await getSession();
   const uid = session?.user?.id;
-  if (!uid) {
-    alert("로그인이 필요합니다.");
-    return;
-  }
+  if (!uid) return alert("로그인이 필요합니다.");
 
   const { error } = await supabase.from("comments").insert([
     { video_id: videoId, uid, content }
@@ -254,7 +200,48 @@ window.deleteComment = async function (videoId, commentId) {
   loadComments(videoId);
 };
 
-// ✅ 로그인 상태 확인 및 UI 전환
+// ✅ 메모 저장
+window.updateNote = async function (videoId) {
+  const input = document.getElementById(`edit-note-${videoId}`);
+  const newNote = input.value.trim();
+  if (!newNote) return alert("메모를 입력하세요.");
+
+  const { error } = await supabase
+    .from("videos")
+    .update({ note: newNote })
+    .eq("id", videoId);
+
+  if (error) {
+    alert("메모 저장 실패: " + error.message);
+    return;
+  }
+
+  document.getElementById(`note-${videoId}`).textContent = newNote;
+  input.value = "";
+  alert("메모가 저장되었습니다.");
+};
+
+// ✅ 메모 삭제
+window.deleteNote = async function (videoId) {
+  const confirmDelete = confirm("정말 메모를 삭제하시겠습니까?");
+  if (!confirmDelete) return;
+
+  const { error } = await supabase
+    .from("videos")
+    .update({ note: "" })
+    .eq("id", videoId);
+
+  if (error) {
+    alert("메모 삭제 실패: " + error.message);
+    return;
+  }
+
+  document.getElementById(`note-${videoId}`).textContent = "없음";
+  document.getElementById(`edit-note-${videoId}`).value = "";
+  alert("메모가 삭제되었습니다.");
+};
+
+// ✅ 로그인 상태 확인
 async function checkLoginStatus() {
   const session = await getSession();
   const authDiv = document.getElementById("authSection");
@@ -272,53 +259,9 @@ async function checkLoginStatus() {
   }
 }
 
-// ✅ 페이지 로딩 시 실행
-// ✅ 페이지 로딩 시 실행
 document.addEventListener("DOMContentLoaded", checkLoginStatus);
-
-// ✅ 전역 등록
 window.uploadVideo = uploadVideo;
 
-window.updateNote = async function(videoId) {
-  const input = document.getElementById(`edit-note-${videoId}`);
-  const newNote = input.value.trim();
-  if (!newNote) {
-    alert("메모 내용을 입력해주세요.");
-    return;
-  }
-
-  const { error } = await supabase
-    .from("videos")
-    .update({ note: newNote })
-    .eq("id", videoId);
-
-  if (error) {
-    alert("메모 업데이트 실패: " + error.message);
-    return;
-  }
-
-  document.getElementById(`note-${videoId}`).textContent = newNote;
-  input.value = "";
-  alert("메모가 저장되었습니다!");
-};
-window.deleteNote = async function(videoId) {
-    const confirmDelete = confirm("정말 메모를 삭제하시겠습니까?");
-    if (!confirmDelete) return;
-  
-    const { error } = await supabase
-      .from("videos")
-      .update({ note: "" })
-      .eq("id", videoId);
-  
-    if (error) {
-      alert("메모 삭제 실패: " + error.message);
-      return;
-    }
-  
-    document.getElementById(`note-${videoId}`).textContent = "없음";
-    document.getElementById(`edit-note-${videoId}`).value = "";
-    alert("메모가 삭제되었습니다.");
-  };
   
   
 
