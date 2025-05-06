@@ -85,7 +85,7 @@ window.deleteVideo = async function (videoId, videoUrl) {
 async function loadAllVideos() {
   const { data: videos, error } = await supabase
     .from("videos")
-    .select("id, uid, url, note, created_at, players(name)")
+    .select("id, uid, url, note, created_at,")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -99,8 +99,6 @@ async function loadAllVideos() {
   container.innerHTML = "";
 
   for (const video of videos) {
-    console.log("✅ video.created_at:", video.created_at);
-    console.log("✅ timeAgo 결과:", timeAgo(video.created_at));
     const videoDiv = document.createElement("div");
     videoDiv.classList.add("space-y-2", "border-b", "pb-4");
 
@@ -109,7 +107,10 @@ async function loadAllVideos() {
 // 영상 목록 반복문 안에서
 videoDiv.innerHTML = `
   <div class="bg-white rounded-2xl shadow-lg p-5 space-y-4">
-    <p class="text-sm text-gray-500"><strong>${video.players?.name || "알 수 없음"}</strong>님이 ${timeAgo(video.created_at)}에 업로드함</p>
+    <p class="text-sm text-gray-500">
+  ${timeAgo(video.created_at)}에 업로드됨
+</p>
+
 
 
     <video 
