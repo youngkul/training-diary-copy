@@ -139,6 +139,12 @@ videoDiv.innerHTML = `
       class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
       메모 삭제
     </button>
+    <!-- 좋아요 버튼 및 수 표시 -->
+    <div class="flex items-center space-x-2 mt-2">
+    <button onclick="toggleLike('${video.id}')" id="like-btn-${video.id}" class="text-red-500 text-xl">❤️</button>
+    <span id="like-count-${video.id}">0</span>명이 좋아요
+    </div>
+
     <button onclick="deleteVideo('${video.id}', '${video.url}')" 
       class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
       영상 삭제
@@ -156,6 +162,7 @@ videoDiv.innerHTML = `
 
     container.appendChild(videoDiv);
     await loadComments(video.id);
+    await loadLikes(video.id); 
   }
   
 }
@@ -322,7 +329,69 @@ window.deleteNote = async function(videoId) {
     document.getElementById(`edit-note-${videoId}`).value = "";
     alert("메모가 삭제되었습니다.");
   };
+  async function loadLikes(videoId) {
+    const session = await getSession();
+    const uid = session?.user?.id;
   
+    const { data: likes, error } = await supabase
+      .from("likes")
+      .select("*")
+      .eq("video_id", videoId);
+  
+    if (error) {
+      console.error("좋아요 로드 실패:", error.message);
+      return;
+    }
+  
+    const count = likes.length;
+    const likeCountEl = document.getElementById(`like-count-${videoId}`);
+    const likeBtn = document.getElementById(`like-btn-${videoId}`);
+    likeCountEl.textContent = count;
+  
+    // 유저가 이미 좋아요 눌렀는지 확인
+    const liked = likes.some(like => like.uid === uid);
+    likeBtn.textContent = liked ? "❤️" : "🤍";
+  }
+  window.toggleLike = async function (videoId) {
+    const session = await getSession();
+    const uid = session?.user?.id;
+    if (!uid) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+  
+    // 이미 좋아요 눌렀는지 확인
+    const { data: existingLike, error: checkError } = await supabase
+      .from("likes")
+      .select("id")
+      .eq("video_id", videoId)
+      .eq("uid", uid)
+      .single();
+  
+    if (checkError && checkError.code !== "PGRST116") {
+      console.error("좋아요 확인 실패:", checkError.message);
+      return;
+    }
+  
+    if (existingLike) {
+      // 좋아요 삭제
+      const { error } = await supabase
+        .from("likes")
+        .delete()
+        .eq("id", existingLike.id);
+      if (error) console.error("좋아요 삭제 실패:", error.message);
+    } else {
+      // 좋아요 추가
+      const { error } = await supabase
+        .from("likes")
+        .insert([{ uid, video_id: videoId }]);
+      if (error) console.error("좋아요 추가 실패:", error.message);
+    }
+  
+    // 다시 로드
+    loadLikes(videoId);
+  };
+    
   
 
 
