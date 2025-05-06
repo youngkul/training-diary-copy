@@ -105,16 +105,17 @@ async function loadAllVideos() {
 
 // 영상 목록 반복문 안에서
 videoDiv.innerHTML = `
-  <p class="text-sm text-gray-600"><strong>등록일:</strong> ${dateStr}</p>
-  <video 
-  src="${video.url}" 
-  controls 
-  preload="metadata" 
-  playsinline 
-  muted 
-  class="w-full rounded-xl shadow-md">
-</video>
+  <div class="bg-white rounded-2xl shadow-lg p-5 space-y-4">
+    <p class="text-sm text-gray-600"><strong>등록일:</strong> ${dateStr}</p>
 
+    <video 
+      src="${video.url}" 
+      controls 
+      preload="metadata" 
+      playsinline 
+      muted 
+      class="w-full aspect-video rounded-xl shadow-lg border border-gray-200">
+    </video>
 
 
   <p class="mt-2 font-medium text-gray-800"><strong>메모:</strong> 

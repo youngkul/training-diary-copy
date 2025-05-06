@@ -1,7 +1,7 @@
 /* style.css - 반응형 고급 스타일 */
 
 body {
-    background: linear-gradient(to right, #f8fafc, #e2e8f0); /* 고급 배경 그라데이션 */
+    background: linear-gradient(to bottom right, #f1f5f9, #e2e8f0);/* 고급 배경 그라데이션 */
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: #1f2937; /* text-gray-800 */
     margin: 0;
