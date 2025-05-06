@@ -111,7 +111,7 @@ videoDiv.innerHTML = `
   controls 
   preload="metadata" 
   class="w-full rounded-xl shadow-md"
-  poster="https://via.placeholder.com/640x360.png?text=영상+미리보기"
+  poster="https://placehold.co/640x360?text=영상+미리보기"
 </video>
 
 
