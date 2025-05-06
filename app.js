@@ -375,34 +375,44 @@ window.deleteNote = async function(videoId) {
   
     // 이미 좋아요 눌렀는지 확인
     const { data: existingLike, error: checkError } = await supabase
-      .from("likes")
-      .select("id")
-      .eq("video_id", videoId)
-      .eq("uid", uid)
-      .single();
-  
-    if (checkError && checkError.code !== "PGRST116") {
-      console.error("좋아요 확인 실패:", checkError.message);
-      return;
+    .from("likes")
+    .select("id")
+    .eq("video_id", videoId)
+    .eq("uid", uid)
+    .maybeSingle();
+
+    if (checkError) {
+    console.error("좋아요 확인 실패:", checkError.message);
+    return;
     }
+
   
     if (existingLike) {
-      // 좋아요 삭제
-      const { error } = await supabase
-        .from("likes")
-        .delete()
-        .eq("id", existingLike.id);
-      if (error) console.error("좋아요 삭제 실패:", error.message);
-    } else {
-      // 좋아요 추가
-      const { error } = await supabase
-        .from("likes")
-        .insert([{ uid, video_id: videoId }]);
-      if (error) console.error("좋아요 추가 실패:", error.message);
-    }
-  
-    // 다시 로드
-    loadLikes(videoId);
+        // 좋아요 삭제
+        const { error: deleteError } = await supabase
+          .from("likes")
+          .delete()
+          .eq("id", existingLike.id);
+      
+        if (deleteError) {
+          console.error("좋아요 삭제 실패:", deleteError.message);
+          return;
+        }
+      } else {
+        // 좋아요 추가
+        const { error: insertError } = await supabase
+          .from("likes")
+          .insert([{ uid, video_id: videoId }]);
+      
+        if (insertError) {
+          console.error("좋아요 추가 실패:", insertError.message);
+          return;
+        }
+      }
+      
+      // 다시 로드
+      await loadLikes(videoId);
+      
   };
     
   
