@@ -335,7 +335,7 @@ window.deleteNote = async function(videoId) {
   
     const { data: likes, error } = await supabase
       .from("likes")
-      .select("*")
+      .select("id, uid")
       .eq("video_id", videoId);
   
     if (error) {
