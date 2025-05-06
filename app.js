@@ -107,12 +107,13 @@ async function loadAllVideos() {
 videoDiv.innerHTML = `
   <p><strong>등록일:</strong> ${dateStr}</p>
   <video 
-    src="${video.url}" 
-    controls 
-    preload="metadata" 
-    class="w-full rounded-xl shadow-md"
-    poster="https://via.placeholder.com/640x360?text=영상+미리보기">
-  </video>
+  src="${video.url}" 
+  controls 
+  preload="metadata" 
+  class="w-full rounded-xl shadow-md"
+  poster="https://your-own-thumbnail.com/썸네일.jpg">
+</video>
+
 
   <p><strong>메모:</strong> <span id="note-${video.id}">${video.note || "없음"}</span></p>
   <input type="text" id="edit-note-${video.id}" placeholder="메모 수정" class="p-1 border rounded w-full mt-1" />
