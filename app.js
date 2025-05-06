@@ -127,50 +127,52 @@ videoDiv.innerHTML = `
 
 
     <video 
-      src="${video.url}" 
-      controls 
-      preload="metadata" 
-      playsinline 
-      muted 
-      class="w-full aspect-video rounded-xl shadow-lg border border-gray-200">
-    </video>
+  src="${video.url}" 
+  controls 
+  preload="metadata" 
+  playsinline 
+  muted 
+  class="w-full aspect-video rounded-xl shadow-lg border border-gray-200">
+</video>
 
+<p class="mt-2 font-medium text-gray-800"><strong>메모:</strong> 
+  <span id="note-${video.id}">${video.note || "없음"}</span>
+</p>
 
-  <p class="mt-2 font-medium text-gray-800"><strong>메모:</strong> 
-    <span id="note-${video.id}">${video.note || "없음"}</span>
-  </p>
+<input type="text" id="edit-note-${video.id}" placeholder="메모 수정" 
+  class="p-2 mt-1 w-full border rounded" />
 
-  <input type="text" id="edit-note-${video.id}" placeholder="메모 수정" 
-    class="p-2 mt-1 w-full border rounded" />
-  
-  <div class="flex space-x-2 mt-2">
-    <button onclick="updateNote('${video.id}')" 
-      class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-      메모 저장
-    </button>
-    <button onclick="deleteNote('${video.id}')" 
-      class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
-      메모 삭제
-    </button>
-    <!-- 좋아요 버튼 및 수 표시 -->
-    <div class="flex items-center space-x-2 mt-2">
-    <button onclick="toggleLike('${video.id}')" id="like-btn-${video.id}" class="text-red-500 text-xl">❤️</button>
-    <span id="like-count-${video.id}">0</span>명이 좋아요
-    </div>
-
-    <button onclick="deleteVideo('${video.id}', '${video.url}')" 
-      class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-      영상 삭제
-    </button>
-  </div>
-
-  <div id="comments-${video.id}" class="mt-4 text-sm text-gray-700"></div>
-  <input type="text" placeholder="댓글 작성" id="comment-input-${video.id}" 
-    class="p-2 mt-2 w-full border rounded" />
-  <button onclick="postComment('${video.id}')" 
-    class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-    댓글 달기
+<!-- 버튼 3개를 한 줄에 정렬 -->
+<div class="flex flex-wrap gap-2 mt-2 items-center">
+  <button onclick="updateNote('${video.id}')" 
+    class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+    메모 저장
   </button>
+  <button onclick="deleteNote('${video.id}')" 
+    class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
+    메모 삭제
+  </button>
+  <button onclick="deleteVideo('${video.id}', '${video.url}')" 
+    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+    영상 삭제
+  </button>
+</div>
+
+<!-- 좋아요 줄을 따로 분리 -->
+<div class="flex items-center space-x-2 mt-2">
+  <button onclick="toggleLike('${video.id}')" id="like-btn-${video.id}" class="text-red-500 text-xl">❤️</button>
+  <span id="like-count-${video.id}" class="text-sm">0</span><span class="text-sm">명이 좋아요</span>
+</div>
+
+<!-- 댓글 영역 -->
+<div id="comments-${video.id}" class="mt-4 text-sm text-gray-700"></div>
+<input type="text" placeholder="댓글 작성" id="comment-input-${video.id}" 
+  class="p-2 mt-2 w-full border rounded" />
+<button onclick="postComment('${video.id}')" 
+  class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+  댓글 달기
+</button>
+
 `;
 
     container.appendChild(videoDiv);
