@@ -120,12 +120,21 @@ async function loadAllVideos() {
 
 // ✅ 댓글 불러오기
 async function loadComments(videoId) {
-  const { data: comments } = await supabase
+  const { data: comments,error } = await supabase
     .from("comments")
     .select("id, uid, content, created_at")
     .eq("video_id", videoId)
     .order("created_at", { ascending: true });
+    if (error) {
+        console.error("댓글 불러오기 오류:", error.message);
+        return;
+        }
 
+    if (!comments) {
+    console.warn("댓글이 없습니다 또는 불러오기 실패");
+    return;
+    }
+    
   const session = await getSession();
   const currentUid = session?.user?.id;
 
