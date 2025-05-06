@@ -31,3 +31,9 @@ video {
   padding-bottom: 1rem;
   border-bottom: 1px solid #ddd;
 }
+#videoNote {
+    background-color: yellow !important;
+    z-index: 9999 !important;
+    position: relative !important;
+  }
+  
