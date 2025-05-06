@@ -1,51 +1,49 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Training Diary</title>
-      
-        <!-- ✅ Tailwind 먼저 불러오고 -->
-        <script src="https://cdn.tailwindcss.com"></script>
-      
-        <!-- ✅ style.css는 맨 아래에 불러오세요 (Tailwind보다 나중에!) -->
-        <link rel="stylesheet" href="style.css?v=3">
-      </head>      
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training Diary</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom CSS (if needed) -->
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen font-sans">
 
-  <!-- 로그인/회원가입 섹션 -->
-  <div id="authSection" class="max-w-sm mx-auto mt-20 p-6 bg-white rounded-xl shadow space-y-4">
-    <h2 class="text-xl font-bold text-center">로그인 또는 회원가입</h2>
-    <input type="email" id="authEmail" placeholder="이메일" class="w-full p-2 border rounded-md" />
-    <input type="password" id="authPassword" placeholder="비밀번호" class="w-full p-2 border rounded-md" />
-    <div class="flex justify-between">
-      <button onclick="handleLogin()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">로그인</button>
-      <button onclick="handleSignup()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">회원가입</button>
+  <!-- 로그인 / 회원가입 섹션 -->
+  <section id="authSection" class="max-w-md mx-auto mt-20 p-6 bg-white rounded-2xl shadow-md space-y-5">
+    <h2 class="text-2xl font-bold text-center text-gray-800">로그인 또는 회원가입</h2>
+    <input type="email" id="authEmail" placeholder="이메일" class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-indigo-200" />
+    <input type="password" id="authPassword" placeholder="비밀번호" class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-indigo-200" />
+    <div class="flex justify-between gap-2">
+      <button onclick="handleLogin()" class="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">로그인</button>
+      <button onclick="handleSignup()" class="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition">회원가입</button>
     </div>
-  </div>
+  </section>
 
   <!-- 로그인 후 메인 섹션 -->
-  <div id="mainSection" class="hidden">
-    <div class="max-w-sm mx-auto mt-10 p-6 bg-green-100 rounded-xl shadow space-y-4">
-      <p id="userInfo" class="text-center font-medium"></p>
-      <button onclick="handleLogout()" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">로그아웃</button>
+  <section id="mainSection" class="hidden">
+    <!-- 로그아웃 박스 -->
+    <div class="max-w-md mx-auto mt-10 p-5 bg-green-100 rounded-xl shadow space-y-3">
+      <p id="userInfo" class="text-center font-medium text-gray-700"></p>
+      <button onclick="handleLogout()" class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition">로그아웃</button>
     </div>
 
-    <!-- 영상 업로드 -->
-    <div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow space-y-4">
-      <h2 class="text-xl font-bold">운동 영상 업로드</h2>
-      <textarea id="videoNote" rows="3" placeholder="운동 설명 메모" class="w-full p-2 border rounded resize-none"></textarea>
-      <input type="file" id="videoInput" accept="video/*" class="w-full" />
-      <button onclick="uploadVideo()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">업로드</button>
+    <!-- 영상 업로드 폼 -->
+    <div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow space-y-4">
+      <h2 class="text-xl font-semibold text-gray-800">훈련 영상 업로드</h2>
+      <textarea id="videoNote" rows="3" placeholder="운동 설명 메모" class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring focus:ring-purple-200"></textarea>
+      <input type="file" id="videoInput" accept="video/*" class="w-full text-gray-700" />
+      <button onclick="uploadVideo()" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition">업로드</button>
     </div>
 
-    <!-- 영상 피드 -->
-    <div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow space-y-6" id="videoFeed">
-      <h2 class="text-xl font-bold mb-4">모든 훈련 영상</h2>
+    <!-- 영상 목록 피드 -->
+    <div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow space-y-6" id="videoFeed">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">모든 훈련 영상</h2>
+      <!-- 여기에 JS로 영상 카드들이 렌더링됨 -->
     </div>
-  </div>
+  </section>
 
   <!-- 스크립트 연결 -->
   <script type="module" src="./supabase-config.js"></script>
@@ -53,5 +51,6 @@
   <script type="module" src="./app.js"></script>
 </body>
 </html>
+
 
 
