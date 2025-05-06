@@ -186,7 +186,15 @@ videoDiv.innerHTML = `
 async function loadComments(videoId) {
     const { data: comments, error } = await supabase
       .from("comments")
-      .select("id, uid, content, created_at")
+      .select(`
+        id,
+        uid,
+        content,
+        created_at,
+        users:uid (
+          user_metadata
+        )
+      `)
       .eq("video_id", videoId)
       .order("created_at", { ascending: true });
   
@@ -196,7 +204,7 @@ async function loadComments(videoId) {
     }
   
     if (!comments) {
-      console.warn("댓글 없음 또는 로드 실패");
+      console.warn("댓글이 없습니다 또는 불러오기 실패");
       return;
     }
   
@@ -206,21 +214,13 @@ async function loadComments(videoId) {
     const commentDiv = document.getElementById(`comments-${videoId}`);
     commentDiv.innerHTML = "<p class='font-semibold'>댓글:</p>";
   
-    for (const comment of comments) {
-      // uid로 사용자 정보 조회
-      let name = "익명";
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("user_metadata")
-        .eq("id", comment.uid)
-        .single();
-  
-      if (!userError && userData?.user_metadata?.full_name) {
-        name = userData.user_metadata.full_name;
-      }
-  
+    comments.forEach(comment => {
       const wrapper = document.createElement("div");
       wrapper.classList.add("flex", "justify-between", "items-center");
+  
+      const name = comment.users?.user_metadata?.full_name || "익명";
+      p.textContent = `- ${name}: ${comment.content}`;
+
   
       const p = document.createElement("p");
       p.innerHTML = `<strong class="text-blue-500">${name}</strong>: ${comment.content}`;
@@ -235,9 +235,8 @@ async function loadComments(videoId) {
       }
   
       commentDiv.appendChild(wrapper);
-    }
+    });
   }
-  
   
 function timeAgo(dateString) {
     const now = new Date();
@@ -252,36 +251,29 @@ function timeAgo(dateString) {
   
 // ✅ 댓글 작성
 window.postComment = async function (videoId) {
-    const input = document.getElementById(`comment-input-${videoId}`);
-    const content = input.value.trim();
-    if (!content) return;
-  
-    const session = await getSession();
-    const uid = session?.user?.id;
-  
-    if (!uid) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-  
-    const { error } = await supabase.from("comments").insert([
-      {
-        video_id: videoId,
-        uid: uid,
-        content: content
-      }
-    ]);
-  
-    if (error) {
-      console.error("댓글 등록 오류:", error.message);
-      alert("댓글 등록 실패");
-      return;
-    }
-  
-    input.value = "";
-    await loadComments(videoId); // 등록 후 즉시 갱신
-  };
-  
+  const input = document.getElementById(`comment-input-${videoId}`);
+  const content = input.value.trim();
+  if (!content) return;
+
+  const session = await getSession();
+  const uid = session?.user?.id;
+  if (!uid) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
+
+  const { error } = await supabase.from("comments").insert([
+    { video_id: videoId, uid, content }
+  ]);
+
+  if (error) {
+    alert("댓글 실패: " + error.message);
+    return;
+  }
+
+  input.value = "";
+  loadComments(videoId);
+};
 
 // ✅ 댓글 삭제
 window.deleteComment = async function (videoId, commentId) {
