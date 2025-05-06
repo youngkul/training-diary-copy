@@ -106,7 +106,7 @@ async function loadAllVideos() {
 // 영상 목록 반복문 안에서
 videoDiv.innerHTML = `
   <div class="bg-white rounded-2xl shadow-lg p-5 space-y-4">
-    <p class="text-sm text-gray-600"><strong>등록일:</strong> ${dateStr}</p>
+    <p class="text-sm text-gray-500">${timeAgo(video.created_at)}에 업로드됨</p>
 
     <video 
       src="${video.url}" 
@@ -148,13 +148,6 @@ videoDiv.innerHTML = `
     댓글 달기
   </button>
 `;
-
-
-
-
-
-
-
 
     container.appendChild(videoDiv);
     await loadComments(video.id);
@@ -204,7 +197,17 @@ async function loadComments(videoId) {
     commentDiv.appendChild(wrapper);
   });
 }
-
+function timeAgo(dateString) {
+    const now = new Date();
+    const uploaded = new Date(dateString);
+    const diff = (now - uploaded) / 1000; // 초 단위
+  
+    if (diff < 60) return "방금 전";
+    if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+    return `${Math.floor(diff / 86400)}일 전`;
+  }
+  
 // ✅ 댓글 작성
 window.postComment = async function (videoId) {
   const input = document.getElementById(`comment-input-${videoId}`);
