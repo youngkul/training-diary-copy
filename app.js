@@ -111,7 +111,7 @@ videoDiv.innerHTML = `
   controls 
   preload="metadata" 
   class="w-full rounded-xl shadow-md"
-  poster="https://your-own-thumbnail.com/썸네일.jpg">
+  poster="https://via.placeholder.com/640x360.png?text=영상+미리보기"
 </video>
 
 
