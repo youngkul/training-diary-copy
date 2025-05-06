@@ -85,7 +85,7 @@ window.deleteVideo = async function (videoId, videoUrl) {
 async function loadAllVideos() {
   const { data: videos, error } = await supabase
     .from("videos")
-    .select("id, uid, url, note, created_at,")
+    .select("id, uid, url, note, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
