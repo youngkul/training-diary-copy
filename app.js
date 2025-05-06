@@ -110,7 +110,11 @@ videoDiv.innerHTML = `
   <p><strong>메모:</strong> <span id="note-${video.id}">${video.note || "없음"}</span></p>
 
   <input type="text" id="edit-note-${video.id}" placeholder="메모 수정" class="p-1 border rounded w-full mt-1" />
-  <button onclick="updateNote('${video.id}')" class="mt-1 bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">메모 저장</button>
+
+  <div class="flex gap-2 mt-1">
+    <button onclick="updateNote('${video.id}')" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">메모 저장</button>
+    <button onclick="deleteNote('${video.id}')" class="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">메모 삭제</button>
+  </div>
 
   ${
     video.uid === currentUid
@@ -122,6 +126,7 @@ videoDiv.innerHTML = `
   <input type="text" placeholder="댓글 작성" id="comment-input-${video.id}" class="p-1 border rounded w-full" />
   <button onclick="postComment('${video.id}')" class="mt-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">댓글 달기</button>
 `;
+
 
 
 
@@ -266,7 +271,25 @@ window.updateNote = async function(videoId) {
   input.value = "";
   alert("메모가 저장되었습니다!");
 };
-
+window.deleteNote = async function(videoId) {
+    const confirmDelete = confirm("정말 메모를 삭제하시겠습니까?");
+    if (!confirmDelete) return;
+  
+    const { error } = await supabase
+      .from("videos")
+      .update({ note: "" })
+      .eq("id", videoId);
+  
+    if (error) {
+      alert("메모 삭제 실패: " + error.message);
+      return;
+    }
+  
+    document.getElementById(`note-${videoId}`).textContent = "없음";
+    document.getElementById(`edit-note-${videoId}`).value = "";
+    alert("메모가 삭제되었습니다.");
+  };
+  
   
 
 
