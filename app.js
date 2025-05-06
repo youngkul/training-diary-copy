@@ -49,37 +49,50 @@ async function uploadVideo() {
 
 // ✅ 영상 삭제
 window.deleteVideo = async function (videoId, videoUrl) {
-  const confirmDelete = confirm("정말 이 영상을 삭제하시겠습니까?");
-  if (!confirmDelete) return;
-
-  const session = await getSession();
-  const uid = session?.user?.id;
-  if (!uid) {
-    alert("로그인이 필요합니다.");
-    return;
-  }
-
-  const filePath = videoUrl.split("/").slice(-2).join("/");
-
-  const { error: fileError } = await supabase.storage
-    .from("training-diary")
-    .remove([filePath]);
-
-  const { error: dbError } = await supabase
-    .from("videos")
-    .delete()
-    .eq("id", videoId)
-    .eq("uid", uid); // 본인만 삭제 가능
-
-  if (fileError || dbError) {
-    console.error("삭제 오류:", fileError || dbError);
-    alert("삭제 실패");
-    return;
-  }
-
-  alert("삭제 완료");
-  loadAllVideos();
-};
+    const confirmDelete = confirm("정말 이 영상을 삭제하시겠습니까?");
+    if (!confirmDelete) return;
+  
+    const session = await getSession();
+    const uid = session?.user?.id;
+    if (!uid) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+  
+    // ✅ 영상 삭제 전에 관련 좋아요 먼저 삭제
+    const { error: likeDeleteError } = await supabase
+      .from("likes")
+      .delete()
+      .eq("video_id", videoId);
+  
+    if (likeDeleteError) {
+      console.error("좋아요 삭제 실패:", likeDeleteError);
+      alert("삭제 실패 (좋아요)");
+      return;
+    }
+  
+    const filePath = videoUrl.split("/").slice(-2).join("/");
+  
+    const { error: fileError } = await supabase.storage
+      .from("training-diary")
+      .remove([filePath]);
+  
+    const { error: dbError } = await supabase
+      .from("videos")
+      .delete()
+      .eq("id", videoId)
+      .eq("uid", uid); // 본인만 삭제 가능
+  
+    if (fileError || dbError) {
+      console.error("삭제 오류:", fileError || dbError);
+      alert("삭제 실패");
+      return;
+    }
+  
+    alert("삭제 완료");
+    loadAllVideos();
+  };
+  
 
 // ✅ 전체 영상 불러오기
 async function loadAllVideos() {
