@@ -103,15 +103,21 @@ async function loadAllVideos() {
 
     const dateStr = new Date(video.created_at).toLocaleDateString("ko-KR");
 
+// 영상 목록 반복문 안에서
 videoDiv.innerHTML = `
   <p><strong>등록일:</strong> ${dateStr}</p>
   <video src="${video.url}" controls width="300" class="rounded shadow"></video>
-  <p><strong>메모:</strong> ${video.note || "없음"}</p>
+  <p><strong>메모:</strong> <span id="note-${video.id}">${video.note || "없음"}</span></p>
+
+  <input type="text" id="edit-note-${video.id}" placeholder="메모 수정" class="p-1 border rounded w-full mt-1" />
+  <button onclick="updateNote('${video.id}')" class="mt-1 bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">메모 저장</button>
+
   ${
     video.uid === currentUid
-      ? `<button onclick="deleteVideo('${video.id}', '${video.url}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">영상 삭제</button>`
+      ? `<button onclick="deleteVideo('${video.id}', '${video.url}')" class="mt-2 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">영상 삭제</button>`
       : ""
   }
+
   <div id="comments-${video.id}" class="mt-2"></div>
   <input type="text" placeholder="댓글 작성" id="comment-input-${video.id}" class="p-1 border rounded w-full" />
   <button onclick="postComment('${video.id}')" class="mt-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">댓글 달기</button>
@@ -236,7 +242,29 @@ document.addEventListener("DOMContentLoaded", checkLoginStatus);
 
 // ✅ 전역 등록
 window.uploadVideo = uploadVideo;
-
+window.updateNote = async function(videoId) {
+    const input = document.getElementById(`edit-note-${videoId}`);
+    const newNote = input.value.trim();
+    if (!newNote) {
+      alert("메모 내용을 입력해주세요.");
+      return;
+    }
+  
+    const { error } = await supabase
+      .from("videos")
+      .update({ note: newNote })
+      .eq("id", videoId);
+  
+    if (error) {
+      alert("메모 업데이트 실패: " + error.message);
+      return;
+    }
+  
+    document.getElementById(`note-${videoId}`).textContent = newNote;
+    input.value = "";
+    alert("메모가 저장되었습니다!");
+  };
+  
 
 
    
