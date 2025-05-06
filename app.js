@@ -219,6 +219,8 @@ async function loadComments(videoId) {
       wrapper.classList.add("flex", "justify-between", "items-center");
   
       const name = comment.users?.user_metadata?.full_name || "익명";
+      p.textContent = `- ${name}: ${comment.content}`;
+
   
       const p = document.createElement("p");
       p.innerHTML = `<strong class="text-blue-500">${name}</strong>: ${comment.content}`;
