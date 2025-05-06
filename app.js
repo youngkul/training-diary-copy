@@ -106,7 +106,8 @@ async function loadAllVideos() {
 // 영상 목록 반복문 안에서
 videoDiv.innerHTML = `
   <p><strong>등록일:</strong> ${dateStr}</p>
-  <video src="${video.url}" controls width="300" class="rounded shadow"></video>
+  <video src="${video.url}" controls preload="metadata" width="300" class="rounded shadow"></video>
+
   <p><strong>메모:</strong> <span id="note-${video.id}">${video.note || "없음"}</span></p>
 
   <input type="text" id="edit-note-${video.id}" placeholder="메모 수정" class="p-1 border rounded w-full mt-1" />
